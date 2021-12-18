@@ -2,11 +2,14 @@ import express, { Request, Response } from 'express';
 import 'dotenv/config';
 import { connect } from './app/database';
 import { UserController } from './app/controllers/UserController';
+import { AuthenticateUserController } from './app/controllers/AuthenticateUserController';
 
 class Server {
   private app: express.Application;
 
   private userController: UserController;
+
+  private authController: AuthenticateUserController;
 
   private PORT: string;
 
@@ -26,6 +29,8 @@ class Server {
       res.send({ message: 'Hello from API!' });
     });
     this.userController = new UserController();
+    this.authController = new AuthenticateUserController();
+    this.app.post('/auth', this.authController.handle);
     this.app.use('/users', this.userController.router);
     console.log('🔛 Loaded routes');
   }
