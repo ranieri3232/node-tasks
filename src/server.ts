@@ -1,8 +1,11 @@
 import express, { Request, Response } from 'express';
 import 'dotenv/config';
-import { connect } from './app/database';
-import { UserController } from './app/controllers/UserController';
+
 import { AuthenticateUserController } from './app/controllers/AuthenticateUserController';
+import { UserController } from './app/controllers/UserController';
+import { TaskController } from './app/controllers/TaskController';
+import { connect } from './app/database';
+import { ensureAuthenticated } from './app/middlewares/ensureAuthenticated';
 
 class Server {
   private app: express.Application;
@@ -10,6 +13,8 @@ class Server {
   private userController: UserController;
 
   private authController: AuthenticateUserController;
+
+  private taskController: TaskController;
 
   private PORT: string;
 
@@ -30,8 +35,10 @@ class Server {
     });
     this.userController = new UserController();
     this.authController = new AuthenticateUserController();
+    this.taskController = new TaskController();
     this.app.post('/auth', this.authController.handle);
     this.app.use('/users', this.userController.router);
+    this.app.use('/tasks', ensureAuthenticated, this.taskController.router);
     console.log('🔛 Loaded routes');
   }
 

@@ -4,12 +4,11 @@ import { UserService } from '../services/UserService';
 import { ensureAuthenticated } from '../middlewares/ensureAuthenticated';
 
 export type UserRequest = {
-  username: string;
-  name: string;
-  password: string;
-  email: string;
+    username: string;
+    name: string;
+    password: string;
+    email: string;
 }
-
 export class UserController {
   public router: Router;
 
@@ -21,7 +20,7 @@ export class UserController {
     this.routes();
   }
 
-  public create = async (req: Request, res: Response) => {
+  private create = async (req: Request, res: Response) => {
     const user:UserRequest = req.body;
     if (!user.name || !user.email || !user.password || !user.username) {
       return res.sendStatus(422);
@@ -38,10 +37,10 @@ export class UserController {
     }
   };
 
-  public index = async (req: Request, res: Response) => {
-    const { userId } = req;
+  private index = async (req: Request, res: Response) => {
+    const { user_id } = req;
     try {
-      const result = await this.userService.index(userId);
+      const result = await this.userService.index(user_id);
       return res.send(result);
     } catch (err) {
       res.statusCode = 409;
@@ -49,13 +48,12 @@ export class UserController {
     }
   };
 
-  public update = async (req: Request, res: Response) => {
-    const { userId } = req;
-    console.log(userId);
+  private update = async (req: Request, res: Response) => {
+    const { user_id } = req;
     const { name, email, username } = req.body;
     try {
       const userUpdated = await this.userService.update({
-        id: userId, name, email, username,
+        id: user_id, name, email, username,
       });
       return res.send({ userUpdated });
     } catch (err) {
@@ -64,19 +62,18 @@ export class UserController {
     }
   };
 
-  public delete = async (req: Request, res: Response) => {
+  private delete = async (req: Request, res: Response) => {
     const { password } = req.body;
-    const { userId } = req;
-    console.log(userId, password);
+    const { user_id } = req;
     try {
-      const result = await this.userService.delete(userId, password);
+      const result = await this.userService.delete(user_id, password);
       return res.send(result);
     } catch (err) {
       return res.send({ message: err.message });
     }
   };
 
-  public routes() {
+  private routes() {
     this.router.get('/', ensureAuthenticated, this.index);
     this.router.post('/', this.create);
     this.router.put('/', ensureAuthenticated, this.update);
